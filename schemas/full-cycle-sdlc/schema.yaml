@@ -1,0 +1,119 @@
+name: full-cycle-sdlc
+version: 1
+description: Full-cycle SDLC workflow - PRD -> SDD + BDD -> TDD -> Code -> Mutation -> Review
+artifacts:
+  - id: prd
+    generates: prd.md
+    description: Product requirements and acceptance criteria
+    template: prd.md
+    instruction: >
+      Create the Product Requirements Document that defines the user problem,
+      goals, non-goals, actors, scope, acceptance criteria, and release gates.
+      Keep this product-focused: describe what must be true for users and the
+      business, not how the implementation will be built. Include affected
+      capabilities, measurable acceptance criteria, business-rule references,
+      manual-validation needs, risks, and open questions. This artifact is the
+      source of truth for SDD and BDD.
+    requires: []
+
+  - id: sdd
+    generates: sdd.md
+    description: Software design derived from the PRD
+    template: sdd.md
+    instruction: >
+      Create the Software Design Document from the PRD. Define architecture,
+      data flow, component boundaries, contracts, dependencies, migration needs,
+      security/performance/accessibility considerations, rollout strategy, and
+      technical risks. Explicitly apply the project Cursor rules that match the
+      affected surfaces: frontend patterns, database workflow/RPC rules, edge
+      function rules, testing, and accessibility. Do not introduce product scope
+      not present in the PRD. The SDD may be created in parallel with BDD
+      because both depend only on PRD.
+    requires:
+      - prd
+
+  - id: bdd
+    generates: bdd.md
+    description: Behavior scenarios derived from the PRD
+    template: bdd.md
+    instruction: >
+      Create behavior-driven scenarios from the PRD. Use Given/When/Then style
+      scenarios that are understandable by QA, product, and engineering. Focus
+      on externally observable behavior, edge cases, permission boundaries,
+      loading/error states, and acceptance criteria. Do not derive scenarios
+      from already-written code; derive them from PRD and clarify gaps as open
+      questions. The BDD may be created in parallel with SDD.
+    requires:
+      - prd
+
+  - id: tdd
+    generates: tdd.md
+    description: Test-first plan derived from PRD, SDD, and BDD
+    template: tdd.md
+    instruction: >
+      Create the test-first plan before implementation. Derive unit,
+      integration, E2E, database, accessibility, manual-validation, and
+      mutation-test targets only from PRD, SDD, and BDD. Do not inspect or mirror
+      already-written implementation as the source of truth for expected
+      behavior. Align the plan with testing-and-ci.mdc: Vitest for unit logic,
+      pgTAP for schema/RPC/RLS, Edge Function tests or exceptions for Deno
+      contracts, Playwright for critical browser flows, and lint/type gates.
+      Identify which tests must fail before code changes, which fixtures/mocks
+      are needed, and which commands form the gate before coding can proceed.
+    requires:
+      - sdd
+      - bdd
+
+  - id: code
+    generates: tasks.md
+    description: Implementation checklist after TDD is defined
+    template: code.md
+    instruction: >
+      Create the implementation checklist only after TDD exists. The apply
+      phase parses checkbox format, so every task must use `- [ ]`. The first
+      implementation group must create or update tests from tdd.md before
+      production code changes. Follow with minimal code tasks, then verification
+      tasks for lint, unit tests, pgTAP when applicable, E2E, generated
+      Supabase types when applicable, mutation testing, and review handoff.
+      Keep tasks small, ordered by dependency, and verifiable.
+    requires:
+      - tdd
+
+  - id: mutation
+    generates: mutation.md
+    description: Mutation-testing result and quality gate
+    template: mutation.md
+    instruction: >
+      Create the mutation gate report after the relevant code and tests have
+      been implemented. Record the command, scope, mutation score, thresholds,
+      survived mutants, equivalent mutants, exclusions, and remediation plan.
+      This gate should not pass while meaningful survived mutants remain above
+      the accepted threshold without an explicit reviewed exception.
+    requires:
+      - code
+
+  - id: review
+    generates: review.md
+    description: Final engineering review and judge gate
+    template: review.md
+    instruction: >
+      Create the final review gate after mutation results exist. Review the
+      change against PRD acceptance criteria, SDD decisions, BDD scenarios, TDD
+      evidence, code quality, security, performance, accessibility, and known
+      risks. Record the judge decision as pass, conditional pass, or fail, with
+      blockers and follow-up actions.
+    requires:
+      - mutation
+
+apply:
+  requires:
+    - code
+  tracks: tasks.md
+  instruction: |
+    Implement only after prd.md, sdd.md, bdd.md, tdd.md, and tasks.md exist.
+    Start by writing or updating the tests specified in tdd.md, using only the
+    PRD/SDD/BDD/TDD artifacts as the expected-behavior source of truth. Then
+    implement the code tasks, mark checkboxes complete as you go, and stop for
+    clarification if a task conflicts with the artifacts. Apply the relevant
+    Cursor rules for each touched surface. After code is done, run the mutation
+    and review gates before treating the change as complete.

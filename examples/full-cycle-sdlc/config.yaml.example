@@ -1,0 +1,50 @@
+schema: full-cycle-sdlc
+
+context: |
+  Descreva aqui a stack e as convenções do seu projeto.
+  Exemplo:
+    Stack: Vite + React 18 + TypeScript, Supabase/Postgres, TanStack Query,
+    React Hook Form + Zod, Tailwind/shadcn-ui, Vitest, Playwright, Stryker.
+
+  SDLC desejado: PRD -> SDD + BDD -> TDD -> Code -> Mutation -> Review.
+  TDD acontece antes do código de produção. Os testes saem dos artefatos
+  PRD/SDD/BDD, não do código existente.
+
+  Adicione aqui também as regras específicas do seu repositório que devem
+  servir como gates ao gerar artefatos OpenSpec.
+
+rules:
+  prd:
+    - Mantenha o escopo de produto explícito: objetivos, não-objetivos, atores, critérios de aceite, perguntas abertas.
+    - Não inclua detalhes de implementação que pertencem ao SDD.
+    - Cite a regra de negócio (documento ou US) quando alterar comportamento sensível.
+    - Decida se a mudança requer roteiro manual de validação.
+
+  sdd:
+    - Derive decisões de design apenas do escopo do PRD.
+    - Documente impactos em banco/RLS/contratos de dados quando aplicável.
+    - Aplique as convenções de frontend, banco, edge functions e acessibilidade do projeto.
+
+  bdd:
+    - Escreva cenários a partir do comportamento descrito no PRD, não do código existente.
+    - Cubra estados de permissão, vazio, inválido, carregando e erro quando relevante.
+    - Use nomes visíveis exatos para menus, botões e campos quando conhecidos.
+
+  tdd:
+    - Defina testes que falham antes do código de produção.
+    - Use PRD, SDD e BDD como fonte da verdade para o comportamento esperado.
+    - Prefira testes que falhem se o bug/regressão voltar; cobertura de linha sozinha não basta.
+    - Inclua testes de banco (pgTAP ou equivalente) quando schema/RPC/trigger/policy/RLS mudarem.
+
+  code:
+    - As primeiras tarefas de implementação devem criar ou atualizar testes do tdd.md.
+    - Mantenha tarefas pequenas, escopadas e verificáveis.
+    - Não marque code como concluído enquanto evidências obrigatórias estiverem faltando.
+
+  mutation:
+    - Registre comando, escopo, score, thresholds, mutantes sobreviventes e exceções aceitas.
+    - Mutantes sobreviventes relevantes exigem remediação ou exceção revisada explícita.
+
+  review:
+    - Comece pelos blockers e pela decisão de judge antes do resumo.
+    - Não passe o gate enquanto evidência crítica de PRD, SDD, BDD, TDD ou mutation estiver faltando.
