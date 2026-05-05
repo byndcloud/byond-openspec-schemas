@@ -133,7 +133,13 @@ cp examples/full-cycle-sdlc/config.yaml.example openspec/config.yaml
 ```
 byond-openspec-schemas/
 ├── README.md
+├── CONTRIBUTING.md
 ├── LICENSE
+├── .cursor/
+│   └── skills/
+│       └── openspec-create-schema/
+│           ├── SKILL.md
+│           └── reference.md
 ├── schemas/
 │   └── full-cycle-sdlc/
 │       ├── schema.yaml
@@ -150,17 +156,35 @@ byond-openspec-schemas/
         └── config.yaml.example
 ```
 
-## Contribuindo
+## Contribuindo um novo schema
 
-Quer adicionar um novo schema? Abra uma branch e siga este padrão:
+Para o passo a passo completo, leia [`CONTRIBUTING.md`](./CONTRIBUTING.md). Resumo dos dois caminhos:
 
-1. Crie `schemas/<nome-do-schema>/schema.yaml` definindo `artifacts`, `requires` e o bloco `apply`.
-2. Crie `schemas/<nome-do-schema>/templates/*.md` com um template para cada artefato declarado em `schema.yaml`.
-3. Adicione `examples/<nome-do-schema>/config.yaml.example` com uma configuração de referência.
-4. Atualize a tabela "Schemas disponíveis" deste README.
-5. Abra um Pull Request.
+### Caminho A — via Cursor Skill (recomendado)
 
-Para validar o schema localmente em um projeto:
+Este repositório inclui a skill [`openspec-create-schema`](./.cursor/skills/openspec-create-schema/SKILL.md), que coleta nome, descrição, artefatos e dependências, e gera todos os arquivos para você. Clone o repo, crie uma branch e peça à IA no Cursor:
+
+```text
+Use a skill openspec-create-schema para criar um schema chamado <nome>
+```
+
+A skill cria os arquivos. Você revisa, valida, commita e abre o PR.
+
+### Caminho B — manual
+
+Crie `schemas/<nome>/schema.yaml`, `schemas/<nome>/templates/*.md`, `examples/<nome>/config.yaml.example` e atualize a tabela "Schemas disponíveis" deste README. Veja o [`CONTRIBUTING.md`](./CONTRIBUTING.md) para detalhes e [`reference.md`](./.cursor/skills/openspec-create-schema/reference.md) da skill para a semântica completa de `schema.yaml`.
+
+### Usar a skill fora do clone
+
+Se você quer a skill disponível em qualquer projeto seu (não só dentro do clone), instale-a no projeto via `degit`:
+
+```bash
+npx degit byndcloud/byond-openspec-schemas/.cursor/skills/openspec-create-schema .cursor/skills/openspec-create-schema
+```
+
+A skill assume que está rodando a partir do clone do `byond-openspec-schemas`, então use-a quando estiver trabalhando para contribuir um schema novo.
+
+### Validar localmente
 
 ```bash
 # dentro de um projeto OpenSpec já inicializado
