@@ -2,6 +2,63 @@
 
 > Stakeholder Requirements Specification — ISO/IEC/IEEE 29148:2018
 
+<!--
+  BOOTSTRAP MODE vs DELTA MODE — check before writing.
+
+  Bootstrap (no openspec/specs/<capability>/spec.md exists):
+  - Code is the only source of truth. docs/user_stories/ are historical context.
+  - Complete code investigation FIRST (see schema instruction), then fill below.
+  - Record investigation findings inline in each section.
+
+  Delta (canonical spec already exists):
+  - Read openspec/specs/<capability>/spec.md as baseline.
+  - Targeted code reading only for the behavior this change touches.
+  - Reference canonical spec requirements by name where applicable.
+
+  In both modes: when code and user stories diverge, code wins.
+  Flag divergences as Open Questions — never resolve them silently.
+-->
+
+## Bootstrap Investigation (fill in Bootstrap mode; delete in Delta mode)
+
+### Code Inventory
+
+| File | Lines | Complexity hotspots |
+| ---- | ----- | ------------------- |
+| `<file>` | `<n>` | `<function>` CC=? / cognitive=? |
+
+### State Map
+
+| State | Type | Purpose |
+| ----- | ---- | ------- |
+| `<name>` | `useState<T>` | <what it controls> |
+
+### Data Flow
+
+| Query / RPC / Edge Function | Table / Name | Trigger / enabled condition |
+| --------------------------- | ------------ | --------------------------- |
+| `useSupabaseQuery` | `<table>` | `<condition>` |
+| `supabase.rpc(...)` | `<rpc_name>` | <when called> |
+| `supabase.functions.invoke(...)` | `<function>` | <when called> |
+
+### Submit / Save Flow
+
+1. <validation step>
+2. <calculation step>
+3. <persistence step>
+4. <side effect>
+
+### Baseline Tests
+
+- Unit/integration: <X tests, Y files, green/failing>
+- E2E Playwright: exists at `<path>` | **none**
+
+### Divergences (code ≠ user story)
+
+- <divergence or none found>
+
+---
+
 ## Problem
 
 <!-- What problem are we solving? Why now? -->

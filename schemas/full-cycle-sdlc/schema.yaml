@@ -7,10 +7,47 @@ artifacts:
     description: Product requirements and acceptance criteria
     template: prd.md
     instruction: >
-      Create the Product Requirements Document that defines the user problem,
-      goals, non-goals, actors, scope, acceptance criteria, and release gates.
-      Keep this product-focused: describe what must be true for users and the
-      business, not how the implementation will be built. Include affected
+      Before writing the PRD, determine the bootstrap mode by checking whether
+      a canonical spec already exists for each capability listed in the change:
+
+
+      BOOTSTRAP MODE (no canonical spec at openspec/specs/<capability>/spec.md):
+
+      - The current codebase is the ONLY source of truth. Do NOT use
+        docs/user_stories/ as authoritative — they may be outdated.
+
+      - Investigate the code before writing anything:
+        1. Read the target page/component files and measure their size.
+        2. Map all React state (useState, useRef, useMemo, derived state).
+        3. Map all Supabase hooks (useSupabaseQuery, useSupabaseInsert, etc.)
+           and their table, filters, and enabled conditions.
+        4. Map all direct supabase.rpc() and supabase.functions.invoke() calls.
+        5. Map all permission checks (usePermission, profile?.primaryRole).
+        6. Trace the submit/save flow step by step, including validation
+           sequence, calculation logic, and post-save side effects.
+        7. Note loading, error, and empty states in the UI.
+        8. Run npm run analyze:complexity and note the top complexity hotspots.
+        9. Run the focused unit/integration tests to confirm green baseline.
+        10. Flag any divergence between code behavior and docs/user_stories/
+            as open questions — never resolve them silently.
+
+      - Then write the PRD from code evidence, not assumptions.
+
+
+      DELTA MODE (canonical spec exists):
+
+      - Read openspec/specs/<capability>/spec.md as the behavioral baseline.
+
+      - Do targeted code reading only to verify the specific behavior this
+        change touches. Do not re-investigate the entire module.
+
+      - Derive the PRD from the canonical spec + the delta being introduced.
+
+
+      BOTH MODES — PRD content:
+
+      Define the user problem, goals, non-goals, actors, scope, acceptance
+      criteria, and release gates. Keep this product-focused. Include affected
       capabilities, measurable acceptance criteria, business-rule references,
       manual-validation needs, change classification (touches pre-existing code,
       frontend change, business-rule change, critical flow), the resulting E2E

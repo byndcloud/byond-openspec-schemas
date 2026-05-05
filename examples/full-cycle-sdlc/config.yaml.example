@@ -10,6 +10,14 @@ context: |
   Mutation -> Review. TDD acontece antes do código de produção. Os testes
   saem dos artefatos PRD, Specs, SDD e BDD, não do código existente.
 
+  FONTE DE VERDADE: o código atual é a fonte de verdade do comportamento
+  existente. User stories e documentos de produto são contexto histórico
+  e podem estar desatualizados. Ao escrever qualquer artefato (PRD, Specs,
+  BDD), sempre derive o comportamento da inspeção do código primeiro.
+  Quando código e user stories divergem, o código vence. Divergências que
+  valem virar decisão de produto devem ser registradas como Open Questions
+  no PRD, nunca silenciosamente assumidas a partir da user story.
+
   Convenção de pastas:
   - Specs canônicas: openspec/specs/<capability>/spec.md
   - Mudanças ativas: openspec/changes/<change-name>/
