@@ -1,6 +1,6 @@
 name: full-cycle-sdlc
-version: 1
-description: Full-cycle SDLC workflow - PRD -> SDD + BDD -> TDD -> Code -> Mutation -> Review
+version: 2
+description: Full-cycle SDLC workflow - PRD -> Specs -> SDD + BDD -> TDD -> Code -> Mutation -> Review
 artifacts:
   - id: prd
     generates: prd.md
@@ -12,54 +12,78 @@ artifacts:
       Keep this product-focused: describe what must be true for users and the
       business, not how the implementation will be built. Include affected
       capabilities, measurable acceptance criteria, business-rule references,
-      manual-validation needs, risks, and open questions. This artifact is the
-      source of truth for SDD and BDD.
+      manual-validation needs, change classification (touches pre-existing code,
+      frontend change, business-rule change, critical flow), the resulting E2E
+      baseline policy (blocking, recommended, not applicable), risks, and open
+      questions. This artifact is the source of truth for Specs, SDD, and BDD.
     requires: []
+
+  - id: specs
+    generates: specs/**/*.md
+    description: Capability specs as the formal contract (delta against canonical specs)
+    template: spec.md
+    instruction: >
+      Create one delta spec file per capability listed in the PRD.
+      Canonical specs live at openspec/specs/<capability>/spec.md.
+      Delta specs live at openspec/changes/<change-name>/specs/<capability>/spec.md.
+      Use ## headers for delta operations: ADDED Requirements, MODIFIED
+      Requirements, REMOVED Requirements, RENAMED Requirements. Each requirement
+      uses `### Requirement: <name>` with SHALL/MUST and at least one
+      `#### Scenario:` with WHEN/THEN. The OpenSpec archive command syncs deltas
+      into canonical specs, so the delta MUST be self-contained and traceable to
+      the PRD acceptance criteria.
+    requires:
+      - prd
 
   - id: sdd
     generates: sdd.md
-    description: Software design derived from the PRD
+    description: Software design derived from the PRD and Specs
     template: sdd.md
     instruction: >
-      Create the Software Design Document from the PRD. Define architecture,
-      data flow, component boundaries, contracts, dependencies, migration needs,
-      security/performance/accessibility considerations, rollout strategy, and
-      technical risks. Explicitly apply the project Cursor rules that match the
-      affected surfaces: frontend patterns, database workflow/RPC rules, edge
-      function rules, testing, and accessibility. Do not introduce product scope
-      not present in the PRD. The SDD may be created in parallel with BDD
-      because both depend only on PRD.
+      Create the Software Design Document from the PRD and Specs. Define
+      architecture, data flow, component boundaries, contracts, dependencies,
+      migration needs, security/performance/accessibility considerations,
+      rollout strategy, and technical risks. Explicitly apply the project Cursor
+      rules that match the affected surfaces: frontend patterns, database
+      workflow/RPC rules, edge function rules, testing, and accessibility. Do
+      not introduce product scope not present in the PRD/Specs. The SDD may be
+      created in parallel with BDD because both depend on Specs.
     requires:
-      - prd
+      - specs
 
   - id: bdd
     generates: bdd.md
-    description: Behavior scenarios derived from the PRD
+    description: Behavior scenarios derived from the PRD and Specs
     template: bdd.md
     instruction: >
-      Create behavior-driven scenarios from the PRD. Use Given/When/Then style
-      scenarios that are understandable by QA, product, and engineering. Focus
-      on externally observable behavior, edge cases, permission boundaries,
-      loading/error states, and acceptance criteria. Do not derive scenarios
-      from already-written code; derive them from PRD and clarify gaps as open
-      questions. The BDD may be created in parallel with SDD.
+      Create behavior-driven scenarios from the PRD and Specs. Use
+      Given/When/Then style scenarios that are understandable by QA, product,
+      and engineering. Focus on externally observable behavior, edge cases,
+      permission boundaries, loading/error states, and acceptance criteria. Do
+      not derive scenarios from already-written code; derive them from PRD and
+      Specs and clarify gaps as open questions. The BDD may be created in
+      parallel with SDD.
     requires:
-      - prd
+      - specs
 
   - id: tdd
     generates: tdd.md
-    description: Test-first plan derived from PRD, SDD, and BDD
+    description: Test-first plan derived from PRD, Specs, SDD, and BDD
     template: tdd.md
     instruction: >
       Create the test-first plan before implementation. Derive unit,
       integration, E2E, database, accessibility, manual-validation, and
-      mutation-test targets only from PRD, SDD, and BDD. Do not inspect or mirror
-      already-written implementation as the source of truth for expected
-      behavior. Align the plan with testing-and-ci.mdc: Vitest for unit logic,
-      pgTAP for schema/RPC/RLS, Edge Function tests or exceptions for Deno
-      contracts, Playwright for critical browser flows, and lint/type gates.
-      Identify which tests must fail before code changes, which fixtures/mocks
-      are needed, and which commands form the gate before coding can proceed.
+      mutation-test targets only from PRD, Specs, SDD, and BDD. Do not inspect
+      or mirror already-written implementation as the source of truth for
+      expected behavior. Align the plan with testing-and-ci.mdc: Vitest for unit
+      logic, pgTAP for schema/RPC/RLS, Edge Function tests or exceptions for
+      Deno contracts, Playwright for critical browser flows, and lint/type
+      gates. Apply the E2E baseline policy declared by the PRD: when blocking,
+      a baseline E2E for the affected flow MUST exist or be created before any
+      production code change; when recommended, document the decision; when not
+      applicable, justify briefly. Identify which tests must fail before code
+      changes, which fixtures/mocks are needed, and which commands form the
+      gate before coding can proceed.
     requires:
       - sdd
       - bdd
@@ -70,12 +94,15 @@ artifacts:
     template: code.md
     instruction: >
       Create the implementation checklist only after TDD exists. The apply
-      phase parses checkbox format, so every task must use `- [ ]`. The first
-      implementation group must create or update tests from tdd.md before
-      production code changes. Follow with minimal code tasks, then verification
-      tasks for lint, unit tests, pgTAP when applicable, E2E, generated
-      Supabase types when applicable, mutation testing, and review handoff.
-      Keep tasks small, ordered by dependency, and verifiable.
+      phase parses checkbox format, so every task must use `- [ ]`. When the
+      PRD/TDD declares E2E baseline as blocking, the FIRST task group must
+      confirm or create the baseline E2E for the affected flow and run it
+      against the unchanged behavior before any other change. Then create or
+      update the tests from tdd.md, then implement the smallest production
+      change, then run verification tasks for lint, unit tests, pgTAP when
+      applicable, E2E, generated Supabase types when applicable, mutation
+      testing, and review handoff. Keep tasks small, ordered by dependency, and
+      verifiable.
     requires:
       - tdd
 
@@ -98,10 +125,13 @@ artifacts:
     template: review.md
     instruction: >
       Create the final review gate after mutation results exist. Review the
-      change against PRD acceptance criteria, SDD decisions, BDD scenarios, TDD
-      evidence, code quality, security, performance, accessibility, and known
-      risks. Record the judge decision as pass, conditional pass, or fail, with
-      blockers and follow-up actions.
+      change against PRD acceptance criteria, Specs delta, SDD decisions, BDD
+      scenarios, TDD evidence, baseline E2E gate enforcement, code quality,
+      security, performance, accessibility, and known risks. Confirm that delta
+      specs at openspec/changes/<change-name>/specs/<capability>/spec.md are
+      ready to be archived into openspec/specs/<capability>/spec.md. Record the
+      judge decision as pass, conditional pass, or fail, with blockers and
+      follow-up actions.
     requires:
       - mutation
 
@@ -110,10 +140,12 @@ apply:
     - code
   tracks: tasks.md
   instruction: |
-    Implement only after prd.md, sdd.md, bdd.md, tdd.md, and tasks.md exist.
+    Implement only after prd.md, specs/**/spec.md, sdd.md, bdd.md, tdd.md, and
+    tasks.md exist. If PRD/TDD declares E2E baseline as blocking for this
+    change, complete the baseline tasks before any production code change.
     Start by writing or updating the tests specified in tdd.md, using only the
-    PRD/SDD/BDD/TDD artifacts as the expected-behavior source of truth. Then
-    implement the code tasks, mark checkboxes complete as you go, and stop for
-    clarification if a task conflicts with the artifacts. Apply the relevant
-    Cursor rules for each touched surface. After code is done, run the mutation
-    and review gates before treating the change as complete.
+    PRD/Specs/SDD/BDD/TDD artifacts as the expected-behavior source of truth.
+    Then implement the code tasks, mark checkboxes complete as you go, and stop
+    for clarification if a task conflicts with the artifacts. Apply the
+    relevant Cursor rules for each touched surface. After code is done, run the
+    mutation and review gates before treating the change as complete.

@@ -6,12 +6,32 @@ context: |
     Stack: Vite + React 18 + TypeScript, Supabase/Postgres, TanStack Query,
     React Hook Form + Zod, Tailwind/shadcn-ui, Vitest, Playwright, Stryker.
 
-  SDLC desejado: PRD -> SDD + BDD -> TDD -> Code -> Mutation -> Review.
-  TDD acontece antes do código de produção. Os testes saem dos artefatos
-  PRD/SDD/BDD, não do código existente.
+  SDLC desejado: PRD -> Specs -> SDD + BDD (parallel) -> TDD -> Code ->
+  Mutation -> Review. TDD acontece antes do código de produção. Os testes
+  saem dos artefatos PRD, Specs, SDD e BDD, não do código existente.
+
+  Convenção de pastas:
+  - Specs canônicas: openspec/specs/<capability>/spec.md
+  - Mudanças ativas: openspec/changes/<change-name>/
+      prd.md
+      specs/<capability>/spec.md   (delta contra a canônica)
+      sdd.md
+      bdd.md
+      tdd.md
+      tasks.md          (gerado pelo artefato `code`)
+      mutation.md
+      review.md
 
   Adicione aqui também as regras específicas do seu repositório que devem
   servir como gates ao gerar artefatos OpenSpec.
+
+  Política de E2E baseline é decidida no PRD e aplicada em TDD/Code/Review.
+  É BLOQUEANTE quando qualquer um dos seguintes for verdadeiro:
+  - Fluxo crítico identificado pela estratégia de QA do projeto.
+  - Mudança de frontend E mudança de regra de negócio na mesma change.
+  - Refactor de hotspot de complexidade pré-existente.
+  Caso contrário, é RECOMENDADA (toca código pré-existente) ou
+  NÃO APLICÁVEL (greenfield sem fluxo em risco).
 
 rules:
   prd:
@@ -19,25 +39,35 @@ rules:
     - Não inclua detalhes de implementação que pertencem ao SDD.
     - Cite a regra de negócio (documento ou US) quando alterar comportamento sensível.
     - Decida se a mudança requer roteiro manual de validação.
+    - Sempre preencha as seções "Change Classification" e "E2E Baseline Policy"; artefatos seguintes dependem disso.
+
+  specs:
+    - Crie um delta spec por capability listada no PRD.
+    - Caminho é openspec/changes/<change-name>/specs/<capability>/spec.md.
+    - Use seções ADDED/MODIFIED/REMOVED/RENAMED Requirements; cenários DEVEM usar exatamente quatro hashtags (####).
+    - Para requirements MODIFIED, copie o bloco existente da spec canônica e edite; não cole conteúdo parcial.
+    - Rastreie cada requirement a um critério de aceite do PRD na tabela de Traceability.
 
   sdd:
-    - Derive decisões de design apenas do escopo do PRD.
-    - Documente impactos em banco/RLS/contratos de dados quando aplicável.
+    - Derive decisões de design apenas do PRD e dos Specs.
+    - Documente impactos em banco/contratos de dados quando aplicável.
     - Aplique as convenções de frontend, banco, edge functions e acessibilidade do projeto.
 
   bdd:
-    - Escreva cenários a partir do comportamento descrito no PRD, não do código existente.
+    - Escreva cenários a partir do comportamento descrito no PRD e nos Specs, não do código existente.
     - Cubra estados de permissão, vazio, inválido, carregando e erro quando relevante.
     - Use nomes visíveis exatos para menus, botões e campos quando conhecidos.
 
   tdd:
     - Defina testes que falham antes do código de produção.
-    - Use PRD, SDD e BDD como fonte da verdade para o comportamento esperado.
+    - Use PRD, Specs, SDD e BDD como fonte da verdade para o comportamento esperado.
     - Prefira testes que falhem se o bug/regressão voltar; cobertura de linha sozinha não basta.
     - Inclua testes de banco (pgTAP ou equivalente) quando schema/RPC/trigger/policy/RLS mudarem.
+    - Honre a política de E2E baseline do PRD: quando bloqueante, planeje um E2E baseline rodando sobre o comportamento atual antes de qualquer mudança.
 
   code:
-    - As primeiras tarefas de implementação devem criar ou atualizar testes do tdd.md.
+    - Quando a política de E2E baseline for bloqueante, o primeiro grupo de tarefas deve confirmar ou criar o E2E baseline e rodá-lo verde antes de qualquer mudança de produção.
+    - O grupo seguinte deve criar ou atualizar testes a partir do tdd.md.
     - Mantenha tarefas pequenas, escopadas e verificáveis.
     - Não marque code como concluído enquanto evidências obrigatórias estiverem faltando.
 
@@ -47,4 +77,5 @@ rules:
 
   review:
     - Comece pelos blockers e pela decisão de judge antes do resumo.
-    - Não passe o gate enquanto evidência crítica de PRD, SDD, BDD, TDD ou mutation estiver faltando.
+    - Não passe o gate enquanto evidência crítica de PRD, Specs, SDD, BDD, TDD, E2E baseline ou mutation estiver faltando.
+    - Confirme que o delta spec está pronto para ser arquivado na canônica em openspec/specs/<capability>/spec.md.

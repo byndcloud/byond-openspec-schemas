@@ -8,7 +8,7 @@ OpenSpec é um framework para documentar e implementar mudanças de software de 
 
 | Schema             | Para quê                                                                                                | Artefatos                                              |
 | ------------------ | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `full-cycle-sdlc`  | Ciclo completo SDLC para mudanças críticas (regra de negócio, faturamento, permissões, refactors grandes). | `prd → sdd + bdd → tdd → code → mutation → review`     |
+| `full-cycle-sdlc`  | Ciclo completo SDLC para mudanças críticas (regra de negócio, faturamento, permissões, refactors grandes). | `prd → specs → sdd + bdd → tdd → code → mutation → review` |
 
 > O schema padrão do OpenSpec (`spec-driven`, com `proposal/design/tasks`) já vem instalado pela CLI e cobre a maioria das mudanças do dia a dia. Use os schemas deste repositório quando precisar de um fluxo mais rigoroso.
 
@@ -63,10 +63,15 @@ Baixe o ZIP do GitHub, extraia, e copie a pasta `schemas/full-cycle-sdlc/` para 
 │  PRD   │  Problema, objetivo, não-escopo, critérios de aceite
 └───┬────┘
     │
+    ▼
+┌────────┐
+│ Specs  │  Delta spec por capability (contra a canônica)
+└───┬────┘
+    │
     ├─────────────┬──────────────┐
     ▼             ▼              │
 ┌────────┐   ┌────────┐          │
-│  SDD   │   │  BDD   │  Em paralelo (ambos derivam só do PRD)
+│  SDD   │   │  BDD   │  Em paralelo (ambos derivam dos Specs)
 └───┬────┘   └───┬────┘          │
     │            │               │
     └─────┬──────┘               │
@@ -88,15 +93,16 @@ Baixe o ZIP do GitHub, extraia, e copie a pasta `schemas/full-cycle-sdlc/` para 
       └────────┘                 │
 ```
 
-| Artefato       | Arquivo         | O que define                                                              |
-| -------------- | --------------- | ------------------------------------------------------------------------- |
-| **PRD**        | `prd.md`        | Problema, objetivo, atores, escopo, critérios de aceite, perguntas abertas.  |
-| **SDD**        | `sdd.md`        | Arquitetura, contratos, dados, segurança, rollout, riscos.                |
-| **BDD**        | `bdd.md`        | Cenários `Given/When/Then` derivados do PRD, prontos para QA e produto.   |
-| **TDD**        | `tdd.md`        | Plano de testes — unit, integração, banco, edge, E2E, mutation, manual.   |
-| **Code**       | `tasks.md`      | Checklist de implementação. Primeiras tarefas obrigatoriamente são testes. |
-| **Mutation**   | `mutation.md`   | Resultado do mutation testing: score, mutantes, exceções.                 |
-| **Review**     | `review.md`     | Decisão final do judge: pass, conditional-pass ou fail.                   |
+| Artefato       | Arquivo                                | O que define                                                                          |
+| -------------- | -------------------------------------- | ------------------------------------------------------------------------------------- |
+| **PRD**        | `prd.md`                               | Problema, objetivo, atores, escopo, critérios de aceite, perguntas abertas, classificação da mudança e política de E2E baseline. |
+| **Specs**      | `specs/<capability>/spec.md`           | Delta spec contra a canônica em `openspec/specs/<capability>/spec.md`, com ADDED/MODIFIED/REMOVED/RENAMED Requirements. |
+| **SDD**        | `sdd.md`                               | Arquitetura, contratos, dados, segurança, rollout, riscos.                            |
+| **BDD**        | `bdd.md`                               | Cenários `Given/When/Then` derivados do PRD e dos Specs, prontos para QA e produto.   |
+| **TDD**        | `tdd.md`                               | Plano de testes — unit, integração, banco, edge, E2E, mutation, manual.               |
+| **Code**       | `tasks.md`                             | Checklist de implementação. Primeiras tarefas obrigatoriamente são testes (e baseline E2E quando bloqueante). |
+| **Mutation**   | `mutation.md`                          | Resultado do mutation testing: score, mutantes, exceções.                             |
+| **Review**     | `review.md`                            | Decisão final do judge: pass, conditional-pass ou fail.                               |
 
 A ordem é forçada pelo schema: você não pode gerar `tdd.md` sem ter `sdd.md` e `bdd.md`, nem rodar `apply` sem `tasks.md`.
 
@@ -110,12 +116,13 @@ Os templates assumem uma stack específica (a stack mais comum dos produtos Beyo
 
 Se o seu projeto usa stack diferente, ajuste os arquivos `templates/*.md` após a instalação:
 
+- `sdd.md`: remova ou substitua as seções `Database / Supabase Design` e `Edge Function Design` pelo equivalente da sua stack.
 - `tdd.md`: troque referências a `pgTAP`, `npm run test:db`, `npx vitest run` pela ferramenta equivalente.
-- `code.md`: ajuste comandos `npm run db:types`, `npm run lint` etc.
+- `code.md`: ajuste comandos `npm run db:types`, `npm run lint`, etc.
 - `review.md`: substitua a checklist de regras Cursor (`code-review.mdc`, `frontend-patterns.mdc`...) pelas convenções do seu projeto.
 - `mutation.md`: troque exemplos `npm run test:mutation:*` pelo seu setup.
 
-Os esqueletos `prd.md`, `sdd.md` e `bdd.md` são quase 100% genéricos e raramente precisam de ajuste.
+Os esqueletos `prd.md`, `spec.md` e `bdd.md` são quase 100% genéricos e raramente precisam de ajuste.
 
 ## Configuração recomendada do `openspec/config.yaml`
 
@@ -148,6 +155,7 @@ byond-openspec-schemas/
 │       ├── schema.yaml
 │       └── templates/
 │           ├── prd.md
+│           ├── spec.md
 │           ├── sdd.md
 │           ├── bdd.md
 │           ├── tdd.md
