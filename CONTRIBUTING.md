@@ -94,7 +94,31 @@ Faça o que a skill faria, na mão.
 
 6. Commite e abra o PR.
 
-Para o detalhamento dos campos de `schema.yaml`, padrões de dependência, regras de templates e erros comuns, veja [`reference.md` da skill](./.cursor/skills/openspec-create-schema/reference.md).
+Para o detalhamento dos campos de `schema.yaml`, padrões de dependência, regras de templates e erros comuns, veja [`docs/schema-reference.md`](./docs/schema-reference.md).
+
+## Como atualizar um schema existente
+
+Quando você precisa **modificar** um schema que já está no repo (adicionar artefato, mudar dependências, atualizar template, bumpar version), também há dois caminhos.
+
+### Caminho A — via Cursor Skill (recomendado)
+
+Use a skill [`openspec-update-schema`](./.cursor/skills/openspec-update-schema/SKILL.md):
+
+```text
+Use a skill openspec-update-schema para adicionar o artefato `security` ao schema full-cycle-sdlc
+```
+
+A skill identifica o tipo de mudança (add/remove/rename artifact, change dependencies, update template, etc.), aplica as edições, valida o grafo de dependências e bumpa `version` automaticamente quando a mudança é breaking. Igual à `create-schema`, **não commita nem abre PR**.
+
+### Caminho B — manual
+
+1. Edite `schemas/<nome>/schema.yaml`.
+2. Edite/adicione/remova templates em `schemas/<nome>/templates/`.
+3. Bumpe `version: <int>` se a mudança for breaking (ver [Bumping de versão](#bumping-de-versão)).
+4. Atualize a linha do schema no `README.md` se a descrição ou lista de artefatos mudou.
+5. Valide localmente, commite e abra PR.
+
+Veja também [`docs/schema-reference.md`](./docs/schema-reference.md) — seção "Common mistakes" lista os erros mais comuns ao editar um schema.
 
 ## Validar localmente
 

@@ -135,11 +135,14 @@ byond-openspec-schemas/
 ├── README.md
 ├── CONTRIBUTING.md
 ├── LICENSE
+├── docs/
+│   └── schema-reference.md          ← semântica completa de schema.yaml
 ├── .cursor/
 │   └── skills/
-│       └── openspec-create-schema/
-│           ├── SKILL.md
-│           └── reference.md
+│       ├── openspec-create-schema/
+│       │   └── SKILL.md             ← criar um schema novo
+│       └── openspec-update-schema/
+│           └── SKILL.md             ← atualizar um schema existente
 ├── schemas/
 │   └── full-cycle-sdlc/
 │       ├── schema.yaml
@@ -156,33 +159,38 @@ byond-openspec-schemas/
         └── config.yaml.example
 ```
 
-## Contribuindo um novo schema
+## Contribuindo
 
-Para o passo a passo completo, leia [`CONTRIBUTING.md`](./CONTRIBUTING.md). Resumo dos dois caminhos:
+O repositório expõe duas Cursor Skills para acelerar contribuições:
 
-### Caminho A — via Cursor Skill (recomendado)
+| Skill | Para quê | Documento |
+| --- | --- | --- |
+| `openspec-create-schema` | Criar um schema novo do zero. | [SKILL.md](./.cursor/skills/openspec-create-schema/SKILL.md) |
+| `openspec-update-schema` | Modificar um schema existente (artefatos, dependências, templates, version bump). | [SKILL.md](./.cursor/skills/openspec-update-schema/SKILL.md) |
 
-Este repositório inclui a skill [`openspec-create-schema`](./.cursor/skills/openspec-create-schema/SKILL.md), que coleta nome, descrição, artefatos e dependências, e gera todos os arquivos para você. Clone o repo, crie uma branch e peça à IA no Cursor:
+Resumo do uso:
 
 ```text
 Use a skill openspec-create-schema para criar um schema chamado <nome>
+Use a skill openspec-update-schema para adicionar `security` ao schema full-cycle-sdlc
 ```
 
-A skill cria os arquivos. Você revisa, valida, commita e abre o PR.
+Ambas as skills criam/editam arquivos. **Você** revisa, valida, commita e abre o PR.
 
-### Caminho B — manual
+Para o passo a passo completo (incluindo o caminho manual sem skills, convenções de naming, validação e regras de bump de versão), leia [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
-Crie `schemas/<nome>/schema.yaml`, `schemas/<nome>/templates/*.md`, `examples/<nome>/config.yaml.example` e atualize a tabela "Schemas disponíveis" deste README. Veja o [`CONTRIBUTING.md`](./CONTRIBUTING.md) para detalhes e [`reference.md`](./.cursor/skills/openspec-create-schema/reference.md) da skill para a semântica completa de `schema.yaml`.
+Para a semântica completa de `schema.yaml` — campos, dependências, padrões de templates e erros comuns — veja [`docs/schema-reference.md`](./docs/schema-reference.md).
 
-### Usar a skill fora do clone
+### Usar as skills fora do clone
 
-Se você quer a skill disponível em qualquer projeto seu (não só dentro do clone), instale-a no projeto via `degit`:
+Se você quer as skills disponíveis em qualquer projeto seu (não só dentro do clone do `byond-openspec-schemas`), instale via `degit`:
 
 ```bash
 npx degit byndcloud/byond-openspec-schemas/.cursor/skills/openspec-create-schema .cursor/skills/openspec-create-schema
+npx degit byndcloud/byond-openspec-schemas/.cursor/skills/openspec-update-schema .cursor/skills/openspec-update-schema
 ```
 
-A skill assume que está rodando a partir do clone do `byond-openspec-schemas`, então use-a quando estiver trabalhando para contribuir um schema novo.
+As skills assumem que estão rodando a partir do clone do `byond-openspec-schemas`, então elas se aplicam quando você está trabalhando para contribuir.
 
 ### Validar localmente
 

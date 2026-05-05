@@ -74,7 +74,7 @@ Rules:
 - `apply.requires` must list the artifact that contains the checkbox tasks (usually `tasks` or `code`).
 - `apply.tracks` is the markdown file the apply command parses for `- [ ]` checkboxes.
 
-For full `schema.yaml` semantics, see [reference.md](reference.md).
+For full `schema.yaml` semantics, see [`docs/schema-reference.md`](../../../docs/schema-reference.md).
 
 ### 2. `schemas/<name>/templates/<artifact>.md`
 
@@ -158,4 +158,4 @@ Next steps:
 
 ## Reference
 
-For `schema.yaml` semantics, artifact dependency rules and template patterns, see [reference.md](reference.md).
+For `schema.yaml` semantics, artifact dependency rules and template patterns, see [`docs/schema-reference.md`](../../../docs/schema-reference.md).
