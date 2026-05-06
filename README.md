@@ -26,6 +26,8 @@ OpenSpec é um framework para documentar e implementar mudanças de software de 
 
 ## Instalação rápida
 
+### Schema
+
 Na raiz do seu projeto:
 
 ```bash
@@ -40,7 +42,31 @@ Depois ative o schema no `openspec/config.yaml`:
 schema: full-cycle-sdlc
 ```
 
-Pronto. A próxima `/opsx-propose` (ou `openspec new change`) vai gerar PRD, SDD, BDD, TDD, tasks, mutation e review na ordem correta.
+Pronto. A próxima `/opsx-propose` (ou `openspec new change`) vai gerar PRD, Specs, SDD, BDD, TDD, tasks, mutation e review na ordem correta.
+
+### Comandos `/opsx-*` (Cursor)
+
+Os comandos que controlam o ciclo completo (`/opsx-propose`, `/opsx-apply`, `/opsx-explore`, `/opsx-archive`) também ficam neste repositório e podem ser instalados via `degit`:
+
+```bash
+npx degit byndcloud/byond-openspec-schemas/.cursor/commands .cursor/commands
+```
+
+> **Nota:** isso sobrescreve qualquer `.cursor/commands/` existente. Se você já tem comandos customizados, copie os arquivos `opsx-*.md` individualmente:
+>
+> ```bash
+> npx degit byndcloud/byond-openspec-schemas/.cursor/commands/opsx-propose.md .cursor/commands/opsx-propose.md
+> npx degit byndcloud/byond-openspec-schemas/.cursor/commands/opsx-apply.md .cursor/commands/opsx-apply.md
+> npx degit byndcloud/byond-openspec-schemas/.cursor/commands/opsx-explore.md .cursor/commands/opsx-explore.md
+> npx degit byndcloud/byond-openspec-schemas/.cursor/commands/opsx-archive.md .cursor/commands/opsx-archive.md
+> ```
+
+| Comando | Para quê |
+| --- | --- |
+| `/opsx-propose` | Criar uma change e gerar todos os artefatos em um passo |
+| `/opsx-apply` | Implementar as tasks de uma change |
+| `/opsx-explore` | Modo de pensamento — explorar ideias antes de propor |
+| `/opsx-archive` | Arquivar uma change concluída via CLI (sincroniza delta specs na canônica) |
 
 ## Métodos alternativos de instalação
 
@@ -145,6 +171,11 @@ byond-openspec-schemas/
 ├── docs/
 │   └── schema-reference.md          ← semântica completa de schema.yaml
 ├── .cursor/
+│   ├── commands/
+│   │   ├── opsx-propose.md          ← criar change + artefatos
+│   │   ├── opsx-apply.md            ← implementar tasks
+│   │   ├── opsx-explore.md          ← modo de exploração
+│   │   └── opsx-archive.md          ← arquivar via CLI (fix: usa `openspec archive`, não `mv`)
 │   └── skills/
 │       ├── openspec-create-schema/
 │       │   └── SKILL.md             ← criar um schema novo
