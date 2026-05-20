@@ -1,0 +1,122 @@
+name: fast-sdlc
+version: 1
+description: Lean SDLC workflow - PRD -> Specs -> Design -> Tasks -> Review (BDD/TDD/Mutation collapsed inline)
+artifacts:
+  - id: prd
+    generates: prd.md
+    description: Product requirements and acceptance criteria (lean)
+    template: prd.md
+    instruction: >
+      Create a lightweight Product Requirements Document. Define the user
+      problem, goals, non-goals, scope, and acceptance criteria. Reference
+      business rules when sensitive logic changes. Keep this product-focused
+      and short — this schema targets medium-risk changes where formal
+      classification and E2E baseline policy from full-cycle-sdlc are
+      overkill.
+
+      If a canonical spec already exists for the affected capability
+      (openspec/specs/<capability>/spec.md), derive the PRD from it plus
+      the delta. If none exists, do a targeted code reading just enough to
+      describe current behavior — but do not run the full 10-step
+      Bootstrap investigation from full-cycle-sdlc. If you find that the
+      change is critical (touches billing, auth, RLS, hot refactor),
+      stop and recommend full-cycle-sdlc instead.
+
+      This artifact is the source of truth for Specs and Design.
+    requires: []
+
+  - id: specs
+    generates: specs/**/*.md
+    description: Capability specs as the formal contract (delta against canonical specs)
+    template: spec.md
+    instruction: >
+      Create one delta spec file per capability listed in the PRD.
+      Canonical specs live at openspec/specs/<capability>/spec.md.
+      Delta specs live at openspec/changes/<change-name>/specs/<capability>/spec.md.
+      Use ## headers for delta operations: ADDED Requirements, MODIFIED
+      Requirements, REMOVED Requirements, RENAMED Requirements. Each
+      requirement uses `### Requirement: <name>` with SHALL/MUST and at
+      least one `#### Scenario:` with WHEN/THEN. The OpenSpec archive
+      command syncs deltas into canonical specs, so the delta MUST be
+      self-contained and traceable to the PRD acceptance criteria.
+    requires:
+      - prd
+
+  - id: design
+    generates: design.md
+    description: Combined software design and behavior scenarios derived from PRD and Specs
+    template: design.md
+    instruction: >
+      Create a unified design document. This artifact merges what
+      full-cycle-sdlc splits between SDD and BDD. Cover:
+
+      - Architecture and component boundaries (the SDD half).
+      - Data flow, contracts, dependencies, and migration needs when
+        applicable.
+      - Behavior scenarios in Given/When/Then style for the main flows
+        and the most relevant edge cases (the BDD half) — keep it focused,
+        not exhaustive.
+      - Security, performance and accessibility notes only when
+        actually impacted by this change.
+      - Test plan as a short bullet list (the TDD half collapsed): which
+        tests are needed before code, at what layer, and the gate command.
+
+      Do not introduce product scope not present in the PRD/Specs. If
+      the design starts touching critical areas (RLS, billing, auth,
+      heavy refactor), stop and recommend escalating to
+      full-cycle-sdlc.
+    requires:
+      - specs
+
+  - id: tasks
+    generates: tasks.md
+    description: Implementation checklist with tests-first
+    template: tasks.md
+    instruction: >
+      Create the implementation checklist after Design exists. The apply
+      phase parses checkbox format, so every task must use `- [ ]`. The
+      first task group MUST create or update the tests called out in
+      design.md before any production code change. Then implement the
+      smallest production change that satisfies the tests, then run the
+      verification gates listed in design.md.
+
+      Keep tasks small, ordered by dependency, and verifiable. End with
+      one explicit task: "Run the review gate (review.md)".
+    requires:
+      - design
+
+  - id: review
+    generates: review.md
+    description: Lightweight review gate
+    template: review.md
+    instruction: >
+      Create a short review gate. This is intentionally lighter than
+      full-cycle-sdlc's review — no separate mutation gate, no judge
+      ceremony. Cover:
+
+      - Acceptance criteria check against the PRD.
+      - Delta spec ready to be archived into the canonical spec.
+      - Lint, type, unit and (when applicable) E2E commands ran green or
+        the failures are documented as pre-existing/unrelated.
+      - Any blockers and follow-ups.
+      - Final decision: pass | conditional pass | fail.
+
+      Do not block on missing mutation testing or formal accessibility
+      audits — those belong to full-cycle-sdlc. If the change turns out
+      to need that level of rigor, recommend re-doing under
+      full-cycle-sdlc.
+    requires:
+      - tasks
+
+apply:
+  requires:
+    - tasks
+  tracks: tasks.md
+  instruction: |
+    Implement only after prd.md, specs/**/spec.md, design.md, and
+    tasks.md exist. Start by writing or updating the tests specified in
+    design.md, using PRD/Specs/Design as the expected-behavior source of
+    truth. Then implement the code tasks, mark checkboxes complete as
+    you go, and stop for clarification if a task conflicts with the
+    artifacts. After code is done, run the review gate (review.md)
+    before treating the change as complete.

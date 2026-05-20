@@ -1,0 +1,59 @@
+schema: fast-sdlc
+
+context: |
+  Descreva aqui a stack e as convenções do seu projeto.
+  Exemplo:
+    Stack: React + TypeScript, banco relacional com RLS, Vitest, Playwright.
+
+  SDLC desejado: PRD -> Specs -> Design -> Tasks -> Review.
+  Versão enxuta para mudanças de risco médio. Para mudanças críticas
+  (faturamento, RLS, refactor de hotspot), use full-cycle-sdlc no
+  byond-openspec-schemas.
+
+  FONTE DE VERDADE: o código atual é a fonte de verdade do comportamento
+  existente. Documentos de produto e user stories são contexto histórico.
+  Quando código e user stories divergem, código vence; divergências viram
+  Open Questions no PRD.
+
+  Convenção de pastas:
+  - Specs canônicas: openspec/specs/<capability>/spec.md
+  - Mudanças ativas: openspec/changes/<change-name>/
+      prd.md
+      specs/<capability>/spec.md   (delta contra a canônica)
+      design.md         (arquitetura + cenários + plano de testes)
+      tasks.md          (gerado pelo artefato `tasks`, com testes primeiro)
+      review.md
+
+rules:
+  prd:
+    - Mantenha o escopo de produto explícito: objetivos, não-objetivos, atores, critérios de aceite, perguntas abertas.
+    - Não inclua detalhes de implementação que pertencem ao Design.
+    - Cite a regra de negócio quando alterar comportamento sensível.
+    - Avalie honestamente se a mudança deveria escalar para full-cycle-sdlc.
+    - Mantenha o PRD curto — este schema é para mudanças de risco médio.
+
+  specs:
+    - Crie um delta spec por capability listada no PRD.
+    - Caminho é openspec/changes/<change-name>/specs/<capability>/spec.md.
+    - Use seções ADDED/MODIFIED/REMOVED/RENAMED Requirements; cenários DEVEM usar exatamente quatro hashtags (####).
+    - Para requirements MODIFIED, copie o bloco existente da spec canônica e edite; não cole conteúdo parcial.
+    - Rastreie cada requirement a um critério de aceite do PRD na tabela de Traceability.
+
+  design:
+    - Combine arquitetura, cenários Given/When/Then e plano de testes em um único documento.
+    - Cubra apenas o que muda; não documente componentes intactos.
+    - Cenários devem cobrir os fluxos principais e edge cases relevantes — não exaustivos.
+    - Plano de testes deve listar layer, alvo, estado inicial (deve falhar antes do código) e comando de gate.
+    - Pare e recomende escalar para full-cycle-sdlc se a mudança tocar áreas críticas.
+
+  tasks:
+    - O primeiro grupo de tarefas DEVE criar ou atualizar os testes do Design antes de qualquer mudança de produção.
+    - Mantenha tarefas pequenas, escopadas e verificáveis.
+    - Inclua tarefa explícita no fim para preencher o review.md.
+    - Nunca marque como concluído enquanto evidências obrigatórias estiverem faltando.
+
+  review:
+    - Comece pela decisão (pass / conditional pass / fail) e blockers.
+    - Confirme que o delta spec está pronto para ser arquivado na canônica.
+    - Não bloqueie por falta de mutation testing ou auditoria de acessibilidade — esses gates pertencem ao full-cycle-sdlc.
+    - Se durante a review ficou claro que a mudança precisava de full-cycle-sdlc, registre isso na seção de retrospectiva.

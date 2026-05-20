@@ -8,9 +8,18 @@ OpenSpec é um framework para documentar e implementar mudanças de software de 
 
 | Schema             | Para quê                                                                                                | Artefatos                                              |
 | ------------------ | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `fast-sdlc`        | Ciclo SDLC enxuto para mudanças de risco médio (preserva specs canônicas e gate de review, sem mutation/judge formal). | `prd → specs → design → tasks → review`                |
 | `full-cycle-sdlc`  | Ciclo completo SDLC para mudanças críticas (regra de negócio, faturamento, permissões, refactors grandes). | `prd → specs → sdd + bdd → tdd → code → mutation → review` |
 
-> O schema padrão do OpenSpec (`spec-driven`, com `proposal/design/tasks`) já vem instalado pela CLI e cobre a maioria das mudanças do dia a dia. Use os schemas deste repositório quando precisar de um fluxo mais rigoroso.
+### Como escolher
+
+| Sinal na demanda | Schema recomendado |
+| --- | --- |
+| Mudança trivial sem regra de negócio sensível | `spec-driven` (default OpenSpec, já instalado pelo `openspec init`) |
+| Mudança de risco médio, regra de negócio simples, feature nova localizada | **`fast-sdlc`** |
+| Faturamento, autorização, RLS, migrations sensíveis, refactor de hotspot | **`full-cycle-sdlc`** |
+
+> Os dois schemas deste repositório usam **delta specs** sincronizadas com canônicas em `openspec/specs/<capability>/spec.md`. A diferença está na quantidade de gates: `fast-sdlc` colapsa SDD/BDD/TDD em um único `design.md` e remove os gates de mutation e judge formal. Se durante a implementação você descobrir que precisava do pipeline completo, o template do `review.md` do `fast-sdlc` te lembra de registrar isso pra calibrar futuras escolhas.
 
 ## Pré-requisitos
 
@@ -28,21 +37,29 @@ OpenSpec é um framework para documentar e implementar mudanças de software de 
 
 ### Schema
 
-Na raiz do seu projeto:
+Escolha um dos schemas abaixo (ou ambos) conforme a tabela "Como escolher" acima.
+
+Para o **fast-sdlc** (recomendado para o dia a dia):
+
+```bash
+npx degit byndcloud/byond-openspec-schemas/schemas/fast-sdlc openspec/schemas/fast-sdlc
+```
+
+Para o **full-cycle-sdlc** (mudanças críticas):
 
 ```bash
 npx degit byndcloud/byond-openspec-schemas/schemas/full-cycle-sdlc openspec/schemas/full-cycle-sdlc
 ```
 
-Isso copia o schema para `openspec/schemas/full-cycle-sdlc/` no seu projeto.
-
-Depois ative o schema no `openspec/config.yaml`:
+Você pode ter os dois schemas no mesmo projeto e escolher o ativo no `openspec/config.yaml`:
 
 ```yaml
-schema: full-cycle-sdlc
+schema: fast-sdlc      # ou full-cycle-sdlc
 ```
 
-Pronto. A próxima `/opsx-propose` (ou `openspec new change`) vai gerar PRD, Specs, SDD, BDD, TDD, tasks, mutation e review na ordem correta.
+Para sobrescrever o schema apenas em uma mudança específica, use `openspec/changes/<nome>/.openspec.yaml`.
+
+Pronto. A próxima `/opsx-propose` (ou `openspec new change`) vai gerar os artefatos do schema ativo na ordem correta.
 
 ### Comandos `/opsx-*` (Cursor)
 
@@ -182,6 +199,14 @@ byond-openspec-schemas/
 │       └── openspec-update-schema/
 │           └── SKILL.md             ← atualizar um schema existente
 ├── schemas/
+│   ├── fast-sdlc/
+│   │   ├── schema.yaml
+│   │   └── templates/
+│   │       ├── prd.md
+│   │       ├── spec.md
+│   │       ├── design.md          ← SDD + BDD + plano de testes em um arquivo
+│   │       ├── tasks.md
+│   │       └── review.md
 │   └── full-cycle-sdlc/
 │       ├── schema.yaml
 │       └── templates/
@@ -194,6 +219,8 @@ byond-openspec-schemas/
 │           ├── mutation.md
 │           └── review.md
 └── examples/
+    ├── fast-sdlc/
+    │   └── config.yaml.example
     └── full-cycle-sdlc/
         └── config.yaml.example
 ```
