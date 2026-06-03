@@ -21,6 +21,8 @@ OpenSpec é um framework para documentar e implementar mudanças de software de 
 
 > Os dois schemas deste repositório usam **delta specs** sincronizadas com canônicas em `openspec/specs/<capability>/spec.md`. A diferença está na quantidade de gates: `fast-sdlc` colapsa SDD/BDD/TDD em um único `design.md` e remove os gates de mutation e judge formal. Se durante a implementação você descobrir que precisava do pipeline completo, o template do `review.md` do `fast-sdlc` te lembra de registrar isso pra calibrar futuras escolhas.
 
+> **E2E baseline também é gate no `fast-sdlc`.** O PRD do `fast-sdlc` tem as seções `Change Classification` e `E2E Baseline Policy`. Quando a política é **blocking** (fluxo crítico, frontend + regra de negócio, ou refactor de hotspot), o primeiro grupo de tarefas (`0. Baseline E2E`) precisa confirmar/criar o baseline E2E e rodá-lo verde **antes** de qualquer código de produção — e o `review.md` reprova (`fail`) se a política blocking ficar com `n/a` ou sem E2E verde. Isso evita que mudança de fluxo crítico rodada como `fast-sdlc` pule E2E.
+
 ## Pré-requisitos
 
 - Node.js **20.19+**

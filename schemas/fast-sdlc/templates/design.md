@@ -59,7 +59,7 @@
 | ----- | ------ | ------------- | ------------ |
 | Unit  | <helper / function> | Fails before code | `<command>` |
 | Integration / DB | <if applicable> | Fails before code | `<command>` |
-| E2E   | <if applicable> | Fails before code | `<command>` |
+| E2E (baseline) | <flow — REQUIRED when PRD E2E Baseline Policy = blocking; `e2e/<flow>.pw.ts`> | Green before code (baseline) | `npm run test:e2e -- <flow>.pw.ts` |
 
 ## Risks / Trade-offs
 
@@ -76,6 +76,7 @@
 - [ ] Design traces back to PRD scope and acceptance criteria.
 - [ ] Data and contract changes are explicit.
 - [ ] Test plan covers the main scenarios from above.
+- [ ] If the PRD E2E Baseline Policy is blocking, the Test Plan includes the baseline E2E row (flow + `e2e/<flow>.pw.ts` + gate command).
 - [ ] No critical area requires escalating to full-cycle-sdlc (billing, RLS, auth, hot refactor).
 
 ## Open Questions

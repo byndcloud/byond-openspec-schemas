@@ -20,7 +20,7 @@ Reviewer:
 - [ ] Delta spec is ready to be archived into the canonical spec.
 - [ ] Lint and type checks ran green.
 - [ ] Unit / integration tests ran green.
-- [ ] E2E flow (if applicable) ran green.
+- [ ] Baseline E2E ran green — REQUIRED when PRD E2E Baseline Policy = blocking. A blocking policy with "n/a" or no green E2E is a FAIL, not a pass.
 - [ ] No new console errors or warnings introduced.
 
 ## Commands Run
@@ -28,7 +28,7 @@ Reviewer:
 ```bash
 npm run lint
 <unit test command>
-<e2e command, if applicable>
+<e2e command — required when E2E Baseline Policy = blocking, e.g. npm run test:e2e -- <flow>.pw.ts>
 npx openspec validate <change-name>
 ```
 
