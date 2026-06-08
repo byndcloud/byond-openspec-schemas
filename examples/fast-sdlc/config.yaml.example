@@ -44,12 +44,12 @@ rules:
     - Combine arquitetura, cenários Given/When/Then e plano de testes em um único documento.
     - Cubra apenas o que muda; não documente componentes intactos.
     - Cenários devem cobrir os fluxos principais e edge cases relevantes — não exaustivos.
-    - Plano de testes deve listar layer, alvo, estado inicial (deve falhar antes do código) e comando de gate.
+    - O Test Plan é obrigatório e não pode ficar vazio para mudanças com lógica (mínimo uma linha Unit). Cada linha lista layer, alvo, estado inicial RED (falha antes do código) e comando de gate.
     - Quando a E2E Baseline Policy do PRD for blocking, a tabela de Test Plan DEVE incluir a linha de baseline E2E (fluxo afetado, caminho `e2e/<flow>.pw.ts` e comando de gate), planejada para rodar verde sobre o comportamento atual antes de qualquer código de produção.
     - Pare e recomende escalar para full-cycle-sdlc se a mudança tocar áreas críticas.
 
   tasks:
-    - O primeiro grupo de tarefas DEVE criar ou atualizar os testes do Design antes de qualquer mudança de produção.
+    - Test-first é obrigatório: o grupo "Tests First" cria os testes do Design e registra a evidência RED (saída do teste falhando) ANTES de qualquer código de produção. Teste escrito depois do código reprova no Review.
     - Quando a E2E Baseline Policy do PRD for blocking, o primeiro grupo de tarefas deve confirmar ou criar o baseline E2E e rodá-lo verde antes de qualquer código de produção. Não marque tarefas como concluídas com política blocking e sem baseline E2E verde.
     - Mantenha tarefas pequenas, escopadas e verificáveis.
     - Inclua tarefa explícita no fim para preencher o review.md.
@@ -58,6 +58,7 @@ rules:
   review:
     - Comece pela decisão (pass / conditional pass / fail) e blockers.
     - Confirme que o delta spec está pronto para ser arquivado na canônica.
+    - Verifique a evidência test-first: cada teste novo deve ter RED registrado em tasks.md (falha antes do código). Testes escritos só depois do código são fail neste gate.
     - Quando a E2E Baseline Policy do PRD for blocking, não passe nem conditional-pass o gate sem evidência de baseline E2E verde (comando + resultado). "n/a" é inválido para política blocking — isso é fail.
     - Não bloqueie por falta de mutation testing ou auditoria de acessibilidade — esses gates pertencem ao full-cycle-sdlc.
     - Se durante a review ficou claro que a mudança precisava de full-cycle-sdlc, registre isso na seção de retrospectiva.

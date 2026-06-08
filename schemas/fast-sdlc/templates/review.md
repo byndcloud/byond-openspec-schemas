@@ -18,6 +18,7 @@ Reviewer:
 
 - [ ] Acceptance criteria from PRD are satisfied.
 - [ ] Delta spec is ready to be archived into the canonical spec.
+- [ ] Test-first was honored: each new test has RED evidence (failing run before the code) recorded in tasks.md group 1. Tests written only after the code are a fail for this gate.
 - [ ] Lint and type checks ran green.
 - [ ] Unit / integration tests ran green.
 - [ ] Baseline E2E ran green — REQUIRED when PRD E2E Baseline Policy = blocking. A blocking policy with "n/a" or no green E2E is a FAIL, not a pass.

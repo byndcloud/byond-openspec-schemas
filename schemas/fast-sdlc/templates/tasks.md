@@ -9,12 +9,13 @@
 - [ ] 0.1 Confirm or create the baseline E2E (Playwright `e2e/<flow>.pw.ts`) for the affected flow.
 - [ ] 0.2 Run it green against UNCHANGED behavior before any production code change.
 
-## 1. Tests First
+## 1. Tests First (mandatory — no production code before this group is green-checked)
 
-- [ ] 1.1 Create or update the failing tests listed in design.md > Test Plan.
-- [ ] 1.2 Run the focused gate command(s) and confirm tests fail for the expected reason.
+- [ ] 1.1 Create or update the failing tests for every row in design.md > Test Plan. Tests come BEFORE any production code in group 2.
+- [ ] 1.2 Run the focused gate command(s) and confirm each test fails for the expected reason (the RED state).
+- [ ] 1.3 Record the RED evidence: paste the failing command output (or the assertion message) so the test-first order is auditable in the PR / review.
 
-## 2. Implementation
+## 2. Implementation (only after group 1 shows RED)
 
 - [ ] 2.1 Implement the smallest production change that turns the tests green.
 - [ ] 2.2 Keep the change scoped to the PRD/Specs contract — no extra refactors.

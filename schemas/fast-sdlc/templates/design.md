@@ -50,15 +50,16 @@
 ## Test Plan
 
 <!--
-  Short bullet list. The TDD half collapsed.
-  For each layer: what gets tested and the command to run.
-  These tests MUST be written before the production code (test-first).
+  The TDD half collapsed. Test-first is mandatory: every test listed here
+  MUST be written and fail (RED) before the production code that satisfies it.
+  This table is REQUIRED and must not be left empty — at least one Unit row
+  for any change with logic. An empty Test Plan fails the Judge Gate below.
 -->
 
 | Layer | Target | Initial state | Gate command |
 | ----- | ------ | ------------- | ------------ |
-| Unit  | <helper / function> | Fails before code | `<command>` |
-| Integration / DB | <if applicable> | Fails before code | `<command>` |
+| Unit  | <helper / function — REQUIRED for any logic change> | Fails before code (RED) | `<command>` |
+| Integration / DB | <if applicable> | Fails before code (RED) | `<command>` |
 | E2E (baseline) | <flow — REQUIRED when PRD E2E Baseline Policy = blocking; `e2e/<flow>.pw.ts`> | Green before code (baseline) | `npm run test:e2e -- <flow>.pw.ts` |
 
 ## Risks / Trade-offs
@@ -75,7 +76,8 @@
 
 - [ ] Design traces back to PRD scope and acceptance criteria.
 - [ ] Data and contract changes are explicit.
-- [ ] Test plan covers the main scenarios from above.
+- [ ] Test Plan is non-empty and every row has a gate command (an empty Test Plan is a fail for any change with logic).
+- [ ] Test plan covers the main scenarios from above, and each test is written to fail before its production code (test-first).
 - [ ] If the PRD E2E Baseline Policy is blocking, the Test Plan includes the baseline E2E row (flow + `e2e/<flow>.pw.ts` + gate command).
 - [ ] No critical area requires escalating to full-cycle-sdlc (billing, RLS, auth, hot refactor).
 
